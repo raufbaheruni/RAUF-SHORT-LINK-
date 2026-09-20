@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAUF BAHERUNI - Link Shortener</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        .brand {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover { opacity: 0.9; }
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            word-break: break-all;
+        }
+        .result.show { display: block; }
+        .link-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px dashed #667eea;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 LINK SHORTENER</h1>
+        <div class="brand">RAUF BAHERUNI</div>
+        
+        <input type="text" id="gdriveUrl" placeholder="Google Drive Link डालें..." />
+        <input type="text" id="customName" value="RAUF" placeholder="Custom Name" />
+        
+        <button onclick="generateLink()">⚡ शॉर्ट लिंक बनाएं</button>
+        
+        <div class="result" id="result">
+            <h3>✅ आपका शॉर्ट लिंक:</h3>
+            <div class="link-box" id="shortLink"></div>
+            <button onclick="copyLink()" style="margin-top: 10px;">📋 कॉपी करें</button>
+        </div>
+    </div>
+
+    <script>
+        function generateLink() {
+            const url = document.getElementById('gdriveUrl').value;
+            const name = document.getElementById('customName').value || 'RAUF';
+            
+            if (!url) { alert('Link डालें!'); return; }
+            
+            // Extract file ID
+            let fileId = '';
+            const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+            if (match) fileId = match[1];
+            else {
+                const match2 = url.match(/id=([a-zA-Z0-9_-]+)/);
+                if (match2) fileId = match2[1];
+            }
+            
+            if (!fileId) { alert('Invalid Google Drive link!'); return; }
+            
+            // Create short link
+            const data = btoa(JSON.stringify({id: fileId, name: name}));
+            const shortUrl = window.location.origin + window.location.pathname + '?rauf=' + data;
+            
+            document.getElementById('shortLink').textContent = shortUrl;
+            document.getElementById('result').classList.add('show');
+        }
+        
+        function copyLink() {
+            const link = document.getElementById('shortLink').textContent;
+            navigator.clipboard.writeText(link).then(() => alert('✅ कॉपी हो गया!'));
+        }
+        
+        // Check for redirect
+        const params = new URLSearchParams(window.location.search);
+        const rauf = params.get('rauf');
+        if (rauf) {
+            const data = JSON.parse(atob(rauf));
+            window.location.href = 'https://drive.google.com/uc?export=download&id=' + data.id;
+        }
+    </script>
+</body>
+</html>
